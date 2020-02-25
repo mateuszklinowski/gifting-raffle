@@ -1,18 +1,20 @@
 import React from 'react';
 
-import { render, fireEvent } from 'test';
+import { render, fireEvent, getByText } from 'test';
 import { Login } from './Login';
 
 describe('LoginContainer', () => {
-  it('Enable login button after user change any input', () => {
+  // TODO say about snapshot
+  it('Show error message for invalid email', () => {
     const { container } = render(<Login onSubmit={jest.fn()} />);
 
-    const loginButton = container.querySelector('button[type="submit"]');
-    expect(loginButton.disabled).toBeTruthy();
+    expect(container.querySelector('.error')).toBeFalsy();
 
-    const loginInput = container.querySelector('[name="email"]');
-    fireEvent.change(loginInput, { target: { value: 'testLogin' } });
-    expect(loginButton.disabled).toBeFalsy();
+    const loginInput = container.querySelector('[name="email"]') as any;
+    fireEvent.change(loginInput, { target: { value: 'incorrectEmail' } });
+
+    expect(container.querySelector('.error')).toBeTruthy();
+    expect(getByText(container, 'validation.email')).toBeTruthy();
   });
 
   it('Invoke on submit with correct values', () => {
@@ -23,13 +25,13 @@ describe('LoginContainer', () => {
     const email = 'testLogin@foo.bar';
     const password = 'testPass';
 
-    const loginInput = container.querySelector('[name="email"]');
+    const loginInput = container.querySelector('[name="email"]') as any;
     fireEvent.change(loginInput, { target: { value: email } });
 
-    const passwordInput = container.querySelector('[name="password"]');
+    const passwordInput = container.querySelector('[name="password"]') as any;
     fireEvent.change(passwordInput, { target: { value: password } });
 
-    const loginButton = container.querySelector('button[type="submit"]');
+    const loginButton = container.querySelector('button[type="submit"]') as any;
     fireEvent.click(loginButton);
 
     expect(onSubmit).toHaveBeenCalledTimes(1);
@@ -37,5 +39,26 @@ describe('LoginContainer', () => {
       email,
       password,
     });
+  });
+
+  it('Disable submit button if form has errors', () => {
+    const onSubmit = jest.fn(() => new Promise(res => res({})));
+
+    const { container } = render(<Login onSubmit={onSubmit} />);
+
+    const email = 'testLogin@foo.bar';
+    const password = '';
+
+    const loginInput = container.querySelector('[name="email"]') as any;
+    fireEvent.change(loginInput, { target: { value: email } });
+
+    const passwordInput = container.querySelector('[name="password"]')as any;
+    fireEvent.change(passwordInput, { target: { value: password } });
+
+    const loginButton = container.querySelector('button[type="submit"]') as any;
+    fireEvent.click(loginButton);
+
+    expect(onSubmit).toHaveBeenCalledTimes(0);
+    expect(loginButton.disabled).toBeTruthy()
   });
 });

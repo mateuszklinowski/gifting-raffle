@@ -46,10 +46,12 @@ export const Login: React.FC<LoginProps> = ({ onSubmit }) => {
     return <Redirect to="/" />;
   }
 
+  const isEmpty = (object: {[key: string]: any}): boolean => Object.values(object).length === 0;
+
   return (
     <Form
       onSubmit={handleSubmit}
-      render={({ handleSubmit, submitting, pristine, submitErrors, dirtySinceLastSubmit }) => (
+      render={({ handleSubmit, submitting, pristine, submitErrors, dirtySinceLastSubmit, errors }) => (
         <StyledGrid textAlign="center" verticalAlign="middle">
           <Grid.Column mobile={14} tablet={8} largeScreen={6} computer={6}>
             <AbsoluteImageContainerForm onSubmit={handleSubmit} size="large">
@@ -82,7 +84,7 @@ export const Login: React.FC<LoginProps> = ({ onSubmit }) => {
                 {!submitting && submitErrors && submitErrors.id && !dirtySinceLastSubmit && (
                   <ErrorText>{formatMessage({ id: submitErrors.id })}</ErrorText>
                 )}
-                <Button type="submit" disabled={pristine || submitting} color="twitter" fluid size="large">
+                <Button type="submit" disabled={pristine || submitting || !isEmpty(errors)} color="twitter" fluid size="large">
                   {formatMessage({ id: 'login.login' })}
                 </Button>
               </Segment>
