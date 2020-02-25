@@ -40,8 +40,8 @@ export const Dashboard: React.FC<DashboardPropsType> = ({ rafflesList, loading, 
     }
   };
 
-  const handleResultSelect = (e: any, { result }: any) => {
-    openDetails(result.value);
+  const handleResultSelect = (e: any) => {
+    openDetails(e);
   };
 
   const handleSearchChange = (e: any, { value }: any) => {
